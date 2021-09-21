@@ -4,20 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.application.config.KeycloakConfig;
+import com.example.application.views.admin.AdminView;
+import com.example.application.views.months.MonthsView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Nav;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.html.Footer;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Header;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -33,6 +29,9 @@ import com.example.application.views.MainLayout;
 import com.example.application.views.helloworld.HelloWorldView;
 import com.example.application.views.about.AboutView;
 import com.vaadin.flow.component.avatar.Avatar;
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.KeycloakSecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * The main view is a top-level placeholder for other views.
@@ -74,6 +73,23 @@ public class MainLayout extends AppLayout {
         setPrimarySection(Section.DRAWER);
         addToNavbar(true, createHeaderContent());
         addToDrawer(createDrawerContent());
+        if(!SecurityContextHolder.getContext()
+            .getAuthentication().getPrincipal().equals("anonymousUser")) {
+            KeycloakPrincipal principal = (KeycloakPrincipal) SecurityContextHolder.getContext()
+                    .getAuthentication().getPrincipal();
+            KeycloakSecurityContext keycloakSecurityContext = principal.getKeycloakSecurityContext();
+
+            String preferredUsername = keycloakSecurityContext.getIdToken().getPreferredUsername();
+            Anchor logout = new Anchor("http://localhost:9991/auth/realms/Demo/protocol/openid-connect/logout?redirect_uri=" +
+                    "http://localhost:8080/",
+                    "Logout");
+            addToNavbar(new HorizontalLayout(new Span(preferredUsername), logout));
+        }
+            else{
+                addToNavbar(new Span("No Logged in User"));
+
+
+        }
     }
 
     private Component createHeaderContent() {
@@ -119,7 +135,8 @@ public class MainLayout extends AppLayout {
     private List<RouterLink> createLinks() {
         MenuItemInfo[] menuItems = new MenuItemInfo[]{ //
                 new MenuItemInfo("Hello World", "la la-globe", HelloWorldView.class), //
-
+                new MenuItemInfo("Months", "la la-globe", MonthsView.class),
+                new MenuItemInfo("Admin", "la la-globe", AdminView.class),
                 new MenuItemInfo("About", "la la-file", AboutView.class), //
 
         };
