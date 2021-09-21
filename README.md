@@ -3,7 +3,7 @@
 This project can be used as a starting point to create your own Vaadin application with Spring Boot.
 It contains all the necessary configuration and some placeholder files to get you started.
 
-This app belongs to keycloak project related with spring-boot-backend 
+This app belongs to keycloak project related with spring-boot-backend https://github.com/LaraMou/spring-boot-backend.git
 
 ## Running the application
 
